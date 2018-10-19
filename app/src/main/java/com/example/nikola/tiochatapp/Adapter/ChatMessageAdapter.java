@@ -46,7 +46,7 @@ public class ChatMessageAdapter extends BaseAdapter {
 
         View view = convertView;
 
-        if(view == null){
+        if(convertView == null){
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             if(qbChatMessages.get(position).getSenderId().equals(QBChatService.getInstance().getUser().getId())){
                 view = inflater.inflate(R.layout.list_send_message, null);

@@ -12,14 +12,17 @@ import com.example.nikola.tiochatapp.Adapter.ChatMessageAdapter;
 import com.example.nikola.tiochatapp.Common.Common;
 import com.example.nikola.tiochatapp.Holder.QBChatMessagesHolder;
 import com.example.nikola.tiochatapp.Holder.QBUsersHolder;
+import com.quickblox.auth.session.QBSession;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBIncomingMessagesManager;
+import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.request.QBMessageGetBuilder;
+import com.quickblox.chat.request.QBMessageUpdateBuilder;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.model.QBUser;
@@ -70,9 +73,9 @@ public class ChatMessageActivity extends AppCompatActivity {
             }
         });*/
 
-        /*QBChatService.ConfigurationBuilder builder = new QBChatService.ConfigurationBuilder();
-builder.setAutojoinEnabled(true);
-QBChatService.setConfigurationBuilder(builder);*/
+        QBChatService.ConfigurationBuilder builder = new QBChatService.ConfigurationBuilder();
+        builder.setAutojoinEnabled(true);
+        QBChatService.setConfigurationBuilder(builder);
 
 
 
@@ -87,12 +90,13 @@ QBChatService.setConfigurationBuilder(builder);*/
                 QBChatMessage chatMessage = new QBChatMessage();
                 chatMessage.setBody(edtContent.getText().toString());
                 chatMessage.setSenderId(QBChatService.getInstance().getUser().getId());
-                /*try {
-                    qbChatDialog.sendMessage(chatMessage);
-                } catch (SmackException.NotConnectedException e) {
-                    e.printStackTrace();
-                }*/
                 chatMessage.setSaveToHistory(true);
+                //chatMessage.setRecipientId(qbChatDialog.getRecipientId());
+                try {
+                    qbChatDialog.sendMessage(chatMessage);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }
 
                 /*try {
                     qbChatDialog.sendMessage(chatMessage);
@@ -100,7 +104,7 @@ QBChatService.setConfigurationBuilder(builder);*/
                     e.printStackTrace();
                 }*/
 
-                qbChatDialog.addMessageListener(new QBChatDialogMessageListener() {
+                /*qbChatDialog.addMessageListener(new QBChatDialogMessageListener() {
                     @Override
                     public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
 
@@ -110,7 +114,7 @@ QBChatService.setConfigurationBuilder(builder);*/
                     public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
 
                     }
-                });
+                });*/
 
                 //Put a message into cache
                 QBChatMessagesHolder.getInstance().putMessage(qbChatDialog.getDialogId(), chatMessage);
@@ -146,11 +150,28 @@ QBChatService.setConfigurationBuilder(builder);*/
 
                 }
             });
+
+            //OVAJ DEO JE TEST
+            /*QBMessageUpdateBuilder messageUpdateBuilder = new QBMessageUpdateBuilder();
+            messageUpdateBuilder.updateText(qbChatDialog.getMessageSentListeners().toString());
+
+            QBRestChatService.updateMessage(qbChatDialog.getLastMessage(), qbChatDialog.getDialogId(), messageUpdateBuilder).performAsync(new QBEntityCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid, Bundle bundle) {
+
+                }
+
+                @Override
+                public void onError(QBResponseException e) {
+
+                }
+            });*/
         }
     }
 
     private void initChatDialogs() {
         qbChatDialog = (QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
+
         qbChatDialog.initForChat(QBChatService.getInstance());
 
         //Register the Incoming Message listener
