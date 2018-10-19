@@ -11,6 +11,7 @@ import android.widget.ListView;
 import com.example.nikola.tiochatapp.Adapter.ChatMessageAdapter;
 import com.example.nikola.tiochatapp.Common.Common;
 import com.example.nikola.tiochatapp.Holder.QBChatMessagesHolder;
+import com.example.nikola.tiochatapp.Holder.QBUsersHolder;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBIncomingMessagesManager;
 import com.quickblox.chat.QBRestChatService;
@@ -21,9 +22,12 @@ import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
+import com.quickblox.users.model.QBUser;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class ChatMessageActivity extends AppCompatActivity {
@@ -42,6 +46,36 @@ public class ChatMessageActivity extends AppCompatActivity {
 
         initViews();
 
+
+        /*try {
+            QBChatDialog privateDialog = ...;
+            QBChatMessage chatMessage = new QBChatMessage();
+            chatMessage.setBody("Hi there!");
+            privateDialog.sendMessage(chatMessage);
+        } catch (SmackException.NotConnectedException e) {
+
+        }
+
+// Add message listener for that particular chat dialog
+
+        privateDialog.addMessageListener(new QBChatDialogMessageListener() {
+            @Override
+            public void processMessage(String dialogId, QBChatMessage message, Integer senderId) {
+
+            }
+
+            @Override
+            public void processError(String dialogId, QBChatException exception, QBChatMessage message, Integer senderId) {
+
+            }
+        });*/
+
+        /*QBChatService.ConfigurationBuilder builder = new QBChatService.ConfigurationBuilder();
+builder.setAutojoinEnabled(true);
+QBChatService.setConfigurationBuilder(builder);*/
+
+
+
         initChatDialogs();
 
         retrieveMessage();
@@ -49,17 +83,34 @@ public class ChatMessageActivity extends AppCompatActivity {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Stisnuo si dugme hehe kako si dobar");
+                //System.out.println("Stisnuo si dugme hehe kako si dobar");
                 QBChatMessage chatMessage = new QBChatMessage();
                 chatMessage.setBody(edtContent.getText().toString());
                 chatMessage.setSenderId(QBChatService.getInstance().getUser().getId());
-                chatMessage.setSaveToHistory(true);
-
-                try {
+                /*try {
                     qbChatDialog.sendMessage(chatMessage);
                 } catch (SmackException.NotConnectedException e) {
                     e.printStackTrace();
-                }
+                }*/
+                chatMessage.setSaveToHistory(true);
+
+                /*try {
+                    qbChatDialog.sendMessage(chatMessage);
+                } catch (SmackException.NotConnectedException e) {
+                    e.printStackTrace();
+                }*/
+
+                qbChatDialog.addMessageListener(new QBChatDialogMessageListener() {
+                    @Override
+                    public void processMessage(String s, QBChatMessage qbChatMessage, Integer integer) {
+
+                    }
+
+                    @Override
+                    public void processError(String s, QBChatException e, QBChatMessage qbChatMessage, Integer integer) {
+
+                    }
+                });
 
                 //Put a message into cache
                 QBChatMessagesHolder.getInstance().putMessage(qbChatDialog.getDialogId(), chatMessage);

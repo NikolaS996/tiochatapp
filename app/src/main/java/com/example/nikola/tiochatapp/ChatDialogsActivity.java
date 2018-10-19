@@ -54,6 +54,9 @@ public class ChatDialogsActivity extends AppCompatActivity {
                 QBChatDialog qbChatDialog = (QBChatDialog) lstChatDialogs.getAdapter().getItem(position);
                 Intent intent = new Intent(ChatDialogsActivity.this, ChatMessageActivity.class);
                 intent.putExtra(Common.DIALOG_EXTRA, qbChatDialog);
+                QBChatService.ConfigurationBuilder builder = new QBChatService.ConfigurationBuilder();
+                builder.setAutojoinEnabled(true);
+                QBChatService.setConfigurationBuilder(builder);
                 startActivity(intent);
             }
         });
