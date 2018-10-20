@@ -12,16 +12,21 @@ import android.widget.Toast;
 
 import com.example.nikola.tiochatapp.Adapter.ListUsersAdapter;
 import com.example.nikola.tiochatapp.Common.Common;
+import com.example.nikola.tiochatapp.Holder.QBChatMessagesHolder;
 import com.example.nikola.tiochatapp.Holder.QBUsersHolder;
 import com.quickblox.chat.QBChatService;
 import com.quickblox.chat.QBRestChatService;
+import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.model.QBChatDialog;
+import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
 import com.quickblox.chat.utils.DialogUtils;
 import com.quickblox.core.QBEntityCallback;
 import com.quickblox.core.exception.QBResponseException;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
+
+import org.jivesoftware.smack.SmackException;
 
 import java.util.ArrayList;
 
@@ -87,6 +92,20 @@ public class ListUsersActivity extends AppCompatActivity {
             public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
                 mDialog.dismiss();
                 Toast.makeText(getBaseContext(), "Chat dialog successfully created", Toast.LENGTH_SHORT).show();
+
+                //Sending system message to recipient
+                QBSystemMessagesManager qbSystemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+                QBChatMessage qbChatMessage = new QBChatMessage();
+                qbChatMessage.setBody(qbChatDialog.getDialogId());
+                for(int i = 0 ; i < qbChatDialog.getOccupants().size() ; i++) {
+                    qbChatMessage.setRecipientId(qbChatDialog.getOccupants().get(i));
+                    try {
+                        qbSystemMessagesManager.sendSystemMessage(qbChatMessage);
+                    } catch (SmackException.NotConnectedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 finish();
             }
 
@@ -109,7 +128,7 @@ public class ListUsersActivity extends AppCompatActivity {
         for(int i = 0 ; i < countChoice ; i++){
             if(checkedItemPositions.get(i))
             {
-                QBUser user = (QBUser) lstUsers.getItemAtPosition(i);
+                final QBUser user = (QBUser) lstUsers.getItemAtPosition(i);
                 QBChatDialog dialog = DialogUtils.buildPrivateDialog(user.getId());
 
                 QBRestChatService.createChatDialog(dialog).performAsync(new QBEntityCallback<QBChatDialog>() {
@@ -117,6 +136,18 @@ public class ListUsersActivity extends AppCompatActivity {
                     public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
                         mDialog.dismiss();
                         Toast.makeText(getBaseContext(), "Private chat dialog successfully created", Toast.LENGTH_SHORT).show();
+
+                        //Sending system message to recipient
+                        QBSystemMessagesManager qbSystemMessagesManager = QBChatService.getInstance().getSystemMessagesManager();
+                        QBChatMessage qbChatMessage = new QBChatMessage();
+                        qbChatMessage.setRecipientId(user.getId());
+                        qbChatMessage.setBody(qbChatDialog.getDialogId());
+                        try {
+                            qbSystemMessagesManager.sendSystemMessage(qbChatMessage);
+                        } catch (SmackException.NotConnectedException e) {
+                            e.printStackTrace();
+                        }
+
                         finish();
                     }
 
