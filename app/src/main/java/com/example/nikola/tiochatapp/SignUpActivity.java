@@ -34,6 +34,10 @@ public class SignUpActivity extends AppCompatActivity {
         edtUser = (EditText) findViewById(R.id.signup_editLogin);
         edtFullName = (EditText) findViewById(R.id.signup_editFullName);
 
+        edtUser.clearFocus();
+        edtPassword.clearFocus();
+        edtFullName.clearFocus();
+
         btnCancel.setOnClickListener(new View.OnClickListener(){
 
             @Override

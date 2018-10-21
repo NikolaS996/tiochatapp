@@ -37,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         edtPassword = (EditText) findViewById(R.id.main_editPassword);
         edtUser = (EditText) findViewById(R.id.main_editLogin);
 
+        edtUser.clearFocus();
+        edtPassword.clearFocus();
+
         btnSignup.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){

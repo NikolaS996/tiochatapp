@@ -5,7 +5,10 @@ import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -34,6 +37,10 @@ import com.quickblox.core.request.QBRequestGetBuilder;
 import com.quickblox.users.QBUsers;
 import com.quickblox.users.model.QBUser;
 
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.XMPPException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,9 +52,32 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
     ListView lstChatDialogs;
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.chat_dialog_menu_user:
+                showUserProfile();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    private void showUserProfile() {
+        Intent intent = new Intent(ChatDialogsActivity.this, UserProfile.class);
+        startActivity(intent);
+    }
+
+    @Override
     protected void onResume(){
         super.onResume();
         loadChatDialogs();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_dialog_menu, menu);
+        return true;
     }
 
     @Override
@@ -55,7 +85,13 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_dialogs);
 
+        //Adding the toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.chat_dialog_toolbar);
+        toolbar.setTitle("Talk it Out");
+        setSupportActionBar(toolbar);
+
         createSessionForChat();
+
 
         lstChatDialogs = (ListView) findViewById(R.id.lstChatDialogs);
         lstChatDialogs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,6 +108,8 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
         });
 
         loadChatDialogs();
+
+
 
         floatingActionButton = findViewById(R.id.chatdialog_adduser);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -191,6 +229,7 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
 
             }
         });
+
     }
 
     @Override
