@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -16,9 +17,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.example.nikola.tiochatapp.Adapter.ChatMessageAdapter;
 import com.example.nikola.tiochatapp.Common.Common;
 import com.example.nikola.tiochatapp.Holder.QBChatMessagesHolder;
@@ -30,9 +34,11 @@ import com.quickblox.chat.QBPrivateChat;
 import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBChatDialogMessageListener;
+import com.quickblox.chat.listeners.QBChatDialogParticipantListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.model.QBPresence;
 import com.quickblox.chat.request.QBDialogRequestBuilder;
 import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.chat.request.QBMessageUpdateBuilder;
@@ -43,9 +49,11 @@ import com.quickblox.users.model.QBUser;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class ChatMessageActivity extends AppCompatActivity implements QBChatDialogMessageListener {
 
@@ -55,6 +63,10 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
     EditText edtContent;
 
     ChatMessageAdapter adapter;
+
+    //Update Online User
+    ImageView img_online_count;
+    TextView txt_online_count;
 
     //Variables for Edit/Delete
     int contextMenuIndexClicked = -1;
@@ -383,6 +395,41 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
                 Log.e("ERROR", e.getMessage());
             }
         });*/
+
+        QBChatDialogParticipantListener participantListener = new QBChatDialogParticipantListener() {
+            @Override
+            public void processPresence(String dialogId, QBPresence qbPresence) {
+                if(dialogId == qbChatDialog.getDialogId()){
+                    QBRestChatService.getChatDialogById(dialogId).performAsync(new QBEntityCallback<QBChatDialog>() {
+                        @Override
+                        public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
+                            //Getting the online user
+                            try {
+                                Collection<Integer> onlineList = qbChatDialog.getOnlineUsers();
+                                TextDrawable.IBuilder builder = TextDrawable.builder().beginConfig().withBorder(4).endConfig().round();
+                                TextDrawable online = builder.build("", Color.parseColor("#632727"));
+
+                                img_online_count.setImageDrawable(online);
+
+                                txt_online_count.setText(String.format("%d/%d online", onlineList.size(), qbChatDialog.getOccupants().size()));
+                            } catch (XMPPException e) {
+                                e.printStackTrace();
+                            } catch (SmackException.NotConnectedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onError(QBResponseException e) {
+
+                        }
+                    });
+                }
+            }
+        };
+
+        qbChatDialog.addParticipantListener((participantListener));
+
         qbChatDialog.addMessageListener(this);
 
         //Setting title for the toolbar
@@ -448,6 +495,9 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
         lstChatMessages = (ListView) findViewById(R.id.list_of_message);
         submitButton = (ImageButton) findViewById(R.id.send_button);
         edtContent = (EditText) findViewById(R.id.edt_content);
+
+        img_online_count = (ImageView) findViewById(R.id.img_online_count);
+        txt_online_count = (TextView) findViewById(R.id.txt_online_count);
 
         //Adding the context menu
         registerForContextMenu(lstChatMessages);
