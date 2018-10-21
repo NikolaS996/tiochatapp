@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,7 @@ import com.quickblox.chat.QBRestChatService;
 import com.quickblox.chat.QBSystemMessagesManager;
 import com.quickblox.chat.exception.QBChatException;
 import com.quickblox.chat.listeners.QBChatDialogMessageListener;
+import com.quickblox.chat.listeners.QBChatDialogParticipantListener;
 import com.quickblox.chat.listeners.QBSystemMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
@@ -81,6 +83,42 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
     }
 
     @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
+        switch(item.getItemId()){
+            case R.id.context_delete_dialog:
+                deleteDialog(info.position);
+                break;
+        }
+
+        return true;
+    }
+
+    private void deleteDialog(int index) {
+        final QBChatDialog chatDialog = (QBChatDialog) lstChatDialogs.getAdapter().getItem(index);
+        QBRestChatService.deleteDialog(chatDialog.getDialogId(), false).performAsync(new QBEntityCallback<Void>() {
+            @Override
+            public void onSuccess(Void aVoid, Bundle bundle) {
+                QBChatDialogHolder.getInstance().removeDialog(chatDialog.getDialogId());
+                ChatDialogsAdapters adapter = new ChatDialogsAdapters(getBaseContext(), QBChatDialogHolder.getInstance().getAllChatDialogs());
+                lstChatDialogs.setAdapter(adapter);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(QBResponseException e) {
+
+            }
+        });
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.chat_dialog_context_menu, menu);
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_dialogs);
@@ -94,15 +132,15 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
 
 
         lstChatDialogs = (ListView) findViewById(R.id.lstChatDialogs);
+
+        registerForContextMenu(lstChatDialogs);
+
         lstChatDialogs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 QBChatDialog qbChatDialog = (QBChatDialog) lstChatDialogs.getAdapter().getItem(position);
                 Intent intent = new Intent(ChatDialogsActivity.this, ChatMessageActivity.class);
                 intent.putExtra(Common.DIALOG_EXTRA, qbChatDialog);
-                //QBChatService.ConfigurationBuilder builder = new QBChatService.ConfigurationBuilder();
-                //builder.setAutojoinEnabled(true);
-                //QBChatService.setConfigurationBuilder(builder);
                 startActivity(intent);
             }
         });
@@ -132,12 +170,6 @@ public class ChatDialogsActivity extends AppCompatActivity implements QBSystemMe
             public void onSuccess(final ArrayList<QBChatDialog> qbChatDialogs, Bundle bundle) {
                 //Put all dialogs into the cache
                 QBChatDialogHolder.getInstance().putDialogs(qbChatDialogs);
-
-                /*Ovaj deo se brise, pa cu da zakomentarisem
-                ChatDialogsAdapters adapter = new ChatDialogsAdapters(getBaseContext(), qbChatDialogs);
-                lstChatDialogs.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                */
 
                 //Unread settings
                 Set<String> setIds = new HashSet<>();
