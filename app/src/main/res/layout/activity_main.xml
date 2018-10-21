@@ -7,11 +7,14 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/mainIcon"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Talk it Out"
         android:textSize="24dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
         android:gravity="center_horizontal"
         android:layout_marginTop="15dp"
         android:textColor="#632727"

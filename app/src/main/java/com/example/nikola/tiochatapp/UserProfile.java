@@ -90,6 +90,8 @@ public class UserProfile extends AppCompatActivity {
 
         initViews();
 
+        toolbar.requestFocus();
+
         loadUserProfile();
 
         btnCancel.setOnClickListener(new View.OnClickListener(){

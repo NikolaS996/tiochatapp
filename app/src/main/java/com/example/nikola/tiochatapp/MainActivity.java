@@ -1,11 +1,14 @@
 package com.example.nikola.tiochatapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.quickblox.auth.session.QBSettings;
@@ -37,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
         edtPassword = (EditText) findViewById(R.id.main_editPassword);
         edtUser = (EditText) findViewById(R.id.main_editLogin);
 
-        edtUser.clearFocus();
-        edtPassword.clearFocus();
+        TextView naslov = (TextView) findViewById(R.id.mainIcon);
+
+        naslov.requestFocus();
+
 
         btnSignup.setOnClickListener(new View.OnClickListener(){
             @Override
