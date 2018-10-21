@@ -1,10 +1,16 @@
 package com.example.nikola.tiochatapp;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +33,7 @@ import com.quickblox.chat.listeners.QBChatDialogMessageListener;
 import com.quickblox.chat.model.QBChatDialog;
 import com.quickblox.chat.model.QBChatMessage;
 import com.quickblox.chat.model.QBDialogType;
+import com.quickblox.chat.request.QBDialogRequestBuilder;
 import com.quickblox.chat.request.QBMessageGetBuilder;
 import com.quickblox.chat.request.QBMessageUpdateBuilder;
 import com.quickblox.core.QBEntityCallback;
@@ -53,6 +60,8 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
     int contextMenuIndexClicked = -1;
     boolean isEditMode = false;
     QBChatMessage editMessage;
+
+    Toolbar toolbar;
 
     @Override
     protected void onDestroy() {
@@ -241,6 +250,84 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.chat_group_editName:
+                editNameGroup();
+                break;
+            case R.id.chat_group_addUser:
+                addUser();
+                break;
+            case R.id.chat_group_removeUser:
+                removeUser();
+                break;
+        }
+        return true;
+    }
+
+    private void removeUser() {
+        Intent intent = new Intent(this, ListUsersActivity.class);
+        intent.putExtra(Common.UPDATE_DIALOG_EXTRA, qbChatDialog);
+        intent.putExtra(Common.UPDATE_MODE, Common.UPDATE_REMOVE_MODE);
+        startActivity(intent);
+    }
+
+    private void addUser() {
+        Intent intent = new Intent(this, ListUsersActivity.class);
+        intent.putExtra(Common.UPDATE_DIALOG_EXTRA, qbChatDialog);
+        intent.putExtra(Common.UPDATE_MODE, Common.UPDATE_ADD_MODE);
+        startActivity(intent);
+    }
+
+    private void editNameGroup() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.dialog_edit_group_layout, null);
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(view);
+        final EditText newName = (EditText) view.findViewById(R.id.edt_newGroupName);
+
+        //Setting Dialog message
+        alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                qbChatDialog.setName(newName.getText().toString()); //setting new name for the dialog
+
+                QBDialogRequestBuilder requestBuilder = new QBDialogRequestBuilder();
+                QBRestChatService.updateGroupChatDialog(qbChatDialog, requestBuilder).performAsync(new QBEntityCallback<QBChatDialog>() {
+                    @Override
+                    public void onSuccess(QBChatDialog qbChatDialog, Bundle bundle) {
+                        Toast.makeText(ChatMessageActivity.this, "Group name successfully edited", Toast.LENGTH_SHORT).show();
+                        toolbar.setTitle(qbChatDialog.getName());
+                    }
+
+                    @Override
+                    public void onError(QBResponseException e) {
+                        Toast.makeText(getBaseContext(), "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        //Creating alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        if(qbChatDialog.getType() == QBDialogType.GROUP || qbChatDialog.getType() == QBDialogType.PUBLIC_GROUP)
+            getMenuInflater().inflate(R.menu.chat_message_group_menu, menu);
+
+        return true;
+    }
+
     private void initChatDialogs() {
         qbChatDialog = (QBChatDialog)getIntent().getSerializableExtra(Common.DIALOG_EXTRA);
 
@@ -297,6 +384,10 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
             }
         });*/
         qbChatDialog.addMessageListener(this);
+
+        //Setting title for the toolbar
+        toolbar.setTitle(qbChatDialog.getName());
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -360,6 +451,9 @@ public class ChatMessageActivity extends AppCompatActivity implements QBChatDial
 
         //Adding the context menu
         registerForContextMenu(lstChatMessages);
+
+        //Adding the toolbar
+        toolbar = (Toolbar) findViewById(R.id.chat_message_toolbar);
     }
 
     @Override

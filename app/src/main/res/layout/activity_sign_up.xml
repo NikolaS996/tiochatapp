@@ -14,7 +14,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/signup_editLogin"
@@ -27,7 +29,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/signup_editFullName"
@@ -40,7 +44,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/signup_editPassword"

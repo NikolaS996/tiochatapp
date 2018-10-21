@@ -23,7 +23,7 @@
                                           <PersistentState>
                                             <option name="values">
                                               <map>
-                                                <entry key="url" value="jar:file:/D:/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_exit_to_app_black_24dp.xml" />
+                                                <entry key="url" value="jar:file:/D:/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/content/ic_backspace_black_24dp.xml" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -34,7 +34,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="imageAsset" value="D:\Android\TiOChatApp\icon.png" />
-                                      <entry key="outputName" value="ic_logout" />
+                                      <entry key="outputName" value="ic_remove" />
                                       <entry key="theme" value="CUSTOM" />
                                       <entry key="themeColor" value="632727" />
                                     </map>
