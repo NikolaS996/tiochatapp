@@ -22,7 +22,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/update_edtOldPassword"
@@ -36,7 +38,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/update_edtPassword"
@@ -50,7 +54,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/update_edtFullName"
@@ -64,7 +70,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/update_edtEmail"
@@ -78,7 +86,9 @@
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            app:hintTextAppearance="@style/TextAppearance.AppCompat">
 
             <EditText
                 android:id="@+id/update_edtPhone"
@@ -86,9 +96,10 @@
                 android:padding="5dp"
                 android:inputType="number"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
         </android.support.design.widget.TextInputLayout>
+
     </LinearLayout>
 
     <LinearLayout
